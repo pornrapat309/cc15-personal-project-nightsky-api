@@ -23,9 +23,9 @@ const registerSchema = Joi.object({
 exports.registerSchema = registerSchema;
 
 const loginSchema = Joi.object({
-    emailOrMobile: Joi.string().required(),
-    username: Joi.string().required(),
+    emailOrMobile: Joi.string(),
+    username: Joi.string(),
     password: Joi.string().required()
-});
+}).or('username', 'emailOrMobile')
 
 exports.loginSchema = loginSchema;
