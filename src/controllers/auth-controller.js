@@ -23,3 +23,31 @@ exports.register = async(req, res, next) => {
         next(err)
     }
 };
+
+exports.login = async(req, res, next) => {
+    try {
+        const {value, error} = loginSchema.validate(req.body);
+        if (error) {
+            next (error);
+        }
+        const user = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    {email: value.emailOrMobile}, {mobile: value.emailOrMobile}, {username: value.username}
+                ]
+            }
+        });
+        if (!user) {
+            return next(createError('Invalid credential', 400));
+        }
+        const isMatch = await bcrypt.compare(value.password, user.password);
+        if (!isMatch) {
+            return next(createError('Invalid credential', 400));
+        }
+        const payload = {userId: user.id};
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET_KEY || 'poiuytrewqlkjhgfdsa', {expiresIn: process.env.JWT_EXPIRE});
+        res.status(200).json({accessToken});
+    } catch (err) {
+        next(err)
+    }
+};
