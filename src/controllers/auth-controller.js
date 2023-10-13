@@ -33,7 +33,8 @@ exports.login = async(req, res, next) => {
         const user = await prisma.user.findFirst({
             where: {
                 OR: [
-                    {email: value.emailOrMobile}, {mobile: value.emailOrMobile}, {username: value.username}
+                    {email: value.emailOrMobileOrUsername}, 
+                    {mobile: value.emailOrMobileOrUsername}, {username: value.emailOrMobileOrUsername}
                 ]
             }
         });
@@ -45,8 +46,11 @@ exports.login = async(req, res, next) => {
             return next(createError('Invalid credential', 400));
         }
         const payload = {userId: user.id};
-        const accessToken = jwt.sign(payload, process.env.JWT_SECRET_KEY || 'poiuytrewqlkjhgfdsa', {expiresIn: process.env.JWT_EXPIRE});
-        res.status(200).json({accessToken});
+        const accessToken = jwt.sign(payload, process.env.JWT_SECRET_KEY || 'poiuytrewqlkjhgfdsa', {
+            expiresIn: process.env.JWT_EXPIRE
+        });
+        delete user.password;
+        res.status(200).json({accessToken, user});
     } catch (err) {
         next(err)
     }
