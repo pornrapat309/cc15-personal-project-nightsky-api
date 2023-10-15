@@ -17,8 +17,8 @@ exports.register = async(req, res, next) => {
         });
         const payload = {userId: user.id};
         const accessToken = jwt.sign(payload, process.env.JWT_SECRET_KEY || 'poiuytrewqlkjhgfdsa', {expiresIn: process.env.JWT_EXPIRE});
-        // delete user.password
-        res.status(201).json({accessToken});
+        delete user.password
+        res.status(201).json({accessToken, user});
     } catch (err) {
         next(err)
     }
