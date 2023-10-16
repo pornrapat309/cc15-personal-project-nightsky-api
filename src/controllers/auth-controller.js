@@ -11,7 +11,6 @@ exports.register = async(req, res, next) => {
             return next(error);
         }
         value.password = await bcrypt.hash(value.password, 12);
-        console.log(value)
         const user = await prisma.user.create({
             data: value
         });
@@ -20,6 +19,12 @@ exports.register = async(req, res, next) => {
         delete user.password
         res.status(201).json({accessToken, user});
     } catch (err) {
+        if (err.name === 'PrismaClientKnownRequestError') {
+            res.status(400).json({
+                message: err.message,
+                emailOrMobileOrUsernameExist: true
+            });
+        }
         next(err)
     }
 };
@@ -34,7 +39,8 @@ exports.login = async(req, res, next) => {
             where: {
                 OR: [
                     {email: value.emailOrMobileOrUsername}, 
-                    {mobile: value.emailOrMobileOrUsername}, {username: value.emailOrMobileOrUsername}
+                    {mobile: value.emailOrMobileOrUsername}, 
+                    {username: value.emailOrMobileOrUsername}
                 ]
             }
         });
