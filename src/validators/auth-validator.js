@@ -1,10 +1,7 @@
 const Joi = require('joi');
 
 const registerSchema = Joi.object({
-    fullName: Joi.alternatives([
-        Joi.string().trim(),
-        ''
-    ]),
+    fullName: Joi.string().trim().empty(''),
     username: Joi.string().trim().required(),
     emailOrMobile: Joi.alternatives([
         Joi.string().email(),

@@ -1,0 +1,8 @@
+{
+    "name": "nightsky-express",
+    "type": "node",
+    "request": "launch",
+    "cwd": "${workspaceFolder}/app.js",
+    "runtimeExecutable": "pnpm",
+    "runtimeArgs": ["run-script", "dev"]
+  }
