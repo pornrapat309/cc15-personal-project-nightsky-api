@@ -10,6 +10,8 @@ authenticateMiddleware,
 uploadMiddleware.fields([
     {name: 'profileImage', maxCount: 1},
 ]),
-userController.updateProfile)
+userController.updateProfileImage)
+
+router.get('/:userId', authenticateMiddleware, userController.getUserById)
 
 module.exports = router;

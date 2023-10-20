@@ -2,9 +2,9 @@ const fs = require('fs/promises');
 const createError = require('../utils/create-error');
 const { upload } = require('../utils/coudinary-service');
 const prisma = require('../models/prisma');
-const { registerSchema } = require('../validators/auth-validator');
+const { checkUserIdSchema } = require('../validators/user-validator');
 
-exports.updateProfile = async(req, res, next) => {
+exports.updateProfileImage = async(req, res, next) => {
     try {
         if (!req.files) {
             return next(createError('profile image is require'))
@@ -29,5 +29,21 @@ exports.updateProfile = async(req, res, next) => {
         if (req.files.profileImage) {
             fs.unlink(req.files.profileImage[0].path);
         }
+    }
+};
+
+exports.getUserById = async (req, res, next) => {
+    try {
+        const {error} = checkUserIdSchema.validate(req.params);
+        if (error) {
+            return next(error)
+        }
+        const userId = +req.params.userId;
+        const user = await prisma.user.findUnique({
+            id: userId
+        });
+        res.status(200).json({user})
+    } catch (err) {
+        next (err)
     }
 };
