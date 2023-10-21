@@ -32,6 +32,16 @@ RESPONSE
 401 { message: String }
 500 { message: String }
 
+UPDATE PROFILE
+PATCH /user
+HEADER AUTHORIZATION Bearer ACCESS_TOKEN
+BODY fullName?
+RESPONSE
+200 { fullName?: String}
+400 { message: String }
+401 { message: String }
+500 { message: String }
+
 GET USER PROFILE BY ID 
 GET /user/:userId
 HEADER AUTHORIZATION Bearer ACCESS_TOKEN

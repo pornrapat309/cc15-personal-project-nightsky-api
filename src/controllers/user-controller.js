@@ -3,6 +3,24 @@ const createError = require('../utils/create-error');
 const { upload } = require('../utils/coudinary-service');
 const prisma = require('../models/prisma');
 const { checkUserIdSchema } = require('../validators/user-validator');
+const { registerSchema } = require('../validators/auth-validator');
+
+exports.updateProfileFullName = async (req, res, next) => {
+    try {
+        const {value} = registerSchema.validate(req.body)
+        const user = await prisma.user.update({
+            data: {
+                fullName: value.fullName
+            },
+            where: {
+                id: req.user.id
+            }
+        });
+        res.status(200).json({user})
+    } catch (err) {
+        next(err)
+    }
+}
 
 exports.updateProfileImage = async(req, res, next) => {
     try {
@@ -40,8 +58,13 @@ exports.getUserById = async (req, res, next) => {
         }
         const userId = +req.params.userId;
         const user = await prisma.user.findUnique({
-            id: userId
+            where: {
+                id: userId
+            }
         });
+        if (user) {
+            delete user.password
+        }
         res.status(200).json({user})
     } catch (err) {
         next (err)

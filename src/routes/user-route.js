@@ -5,6 +5,8 @@ const uploadMiddleware = require('../middlewares/upload');
 
 const router = express.Router();
 
+router.patch('/', authenticateMiddleware, userController.updateProfileFullName)
+
 router.patch('/', 
 authenticateMiddleware, 
 uploadMiddleware.fields([
