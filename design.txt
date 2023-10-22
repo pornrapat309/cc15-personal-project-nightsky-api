@@ -46,6 +46,18 @@ GET USER PROFILE BY ID
 GET /user/:userId
 HEADER AUTHORIZATION Bearer ACCESS_TOKEN
 RESPONSE 
-200 {user: {id: Number, fullName: String, ...}, status: String, friends: [{id: Number, fullName: String, ...}]}
+200 {user: {id: Number, fullName: String, ...}, 
+status: String, following: [{id: Number, fullName: String, ...}]
+status: String, follower: [{id: Number, fullName: String, ...}]
+status: String, unknown: [{id: Number, fullName: String, ...}]}
+401 {message: String}
+500 {message: String}
+
+REQUEST FOLLOW
+POST /follow/:receiverId
+HEADER AUTHORIZATION Bearer ACCESS_TOKEN
+RESPONSE 
+200 {message: String}
+400 {message: String}
 401 {message: String}
 500 {message: String}

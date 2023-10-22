@@ -8,6 +8,7 @@ const errorMiddleware = require('./middlewares/error');
 const rateLimitMiddleware = require('./middlewares/rate-limit');
 const authRoute = require('./routes/auth-route');
 const userRoute = require('./routes/user-route');
+const followRoute = require('./routes/follow-route');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 
 app.use('/auth', authRoute);
 app.use('/user', userRoute);
+app.use('/follow', followRoute);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);

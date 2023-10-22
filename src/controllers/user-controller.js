@@ -3,22 +3,33 @@ const createError = require('../utils/create-error');
 const { upload } = require('../utils/coudinary-service');
 const prisma = require('../models/prisma');
 const { checkUserIdSchema } = require('../validators/user-validator');
-const { registerSchema } = require('../validators/auth-validator');
+const { AUTH_USER, UNKNOWN, FOLLOWER, FOLLOWING, INRELATIONSHIP } = require('../config/constants');
 
-exports.updateProfileFullName = async (req, res, next) => {
-    try {
-        const {value} = registerSchema.validate(req.body)
-        const user = await prisma.user.update({
-            data: {
-                fullName: value.fullName
-            },
-            where: {
-                id: req.user.id
-            }
-        });
-        res.status(200).json({user})
-    } catch (err) {
-        next(err)
+const getTargetUserStatusWithAuthUser = async (targetUserId, authUserId) => {
+    if (targetUserId === authUserId) {
+        return AUTH_USER
+    }
+    const relationship = await prisma.follow.findFirst({
+        where: {
+            OR: [
+                {requesterId: targetUserId, receiverId: authUserId},
+                {requesterId: authUserId, receiverId: targetUserId},
+    
+            ]
+        }
+    });
+
+    // if ((relationship.requesterId === authUserId && relationship.receiverId === targetUserId) && (relationship.requesterId === targetUserId && relationship.receiverId === authUserId)) {
+    //     return INRELATIONSHIP
+    // }
+    if (!relationship) {
+        return UNKNOWN
+    } 
+    if (relationship.requesterId === authUserId) {
+        return FOLLOWING
+    }
+    if (relationship.receiverId === authUserId) {
+        return FOLLOWER
     }
 }
 
@@ -33,7 +44,7 @@ exports.updateProfileImage = async(req, res, next) => {
             response.profileImage = url;
             await prisma.user.update({
                 data: {
-                    profileImage: url
+                    profileImage: url,
                 },
                 where: {
                     id: req.user.id
@@ -62,10 +73,14 @@ exports.getUserById = async (req, res, next) => {
                 id: userId
             }
         });
+
+        let status = null;
+
         if (user) {
-            delete user.password
+            delete user.password;
+            status = await getTargetUserStatusWithAuthUser(userId, req.user.id)
         }
-        res.status(200).json({user})
+        res.status(200).json({user, status})
     } catch (err) {
         next (err)
     }
