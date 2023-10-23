@@ -9,7 +9,7 @@ const getTargetUserStatusWithAuthUser = async (targetUserId, authUserId) => {
     if (targetUserId === authUserId) {
         return AUTH_USER
     }
-    const relationship = await prisma.follow.findFirst({
+    const relationship = await prisma.follow.findMany({
         where: {
             OR: [
                 {requesterId: targetUserId, receiverId: authUserId},
@@ -19,16 +19,17 @@ const getTargetUserStatusWithAuthUser = async (targetUserId, authUserId) => {
         }
     });
 
-    // if ((relationship.requesterId === authUserId && relationship.receiverId === targetUserId) && (relationship.requesterId === targetUserId && relationship.receiverId === authUserId)) {
-    //     return INRELATIONSHIP
-    // }
-    if (!relationship) {
+    if (relationship.length === 2) {
+        return INRELATIONSHIP
+    }
+
+    if (relationship.length === 0) {
         return UNKNOWN
     } 
-    if (relationship.requesterId === authUserId) {
+    if (relationship[0].requesterId === authUserId) {
         return FOLLOWING
     }
-    if (relationship.receiverId === authUserId) {
+    if (relationship[0].receiverId === authUserId) {
         return FOLLOWER
     }
 }
