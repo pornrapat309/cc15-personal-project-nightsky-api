@@ -3,7 +3,7 @@ const createError = require('../utils/create-error');
 const { upload } = require('../utils/coudinary-service');
 const prisma = require('../models/prisma');
 const { checkUserIdSchema } = require('../validators/user-validator');
-const { AUTH_USER, UNKNOWN, FOLLOWER, FOLLOWING, INRELATIONSHIP } = require('../config/constants');
+const { AUTH_USER, UNKNOWN, FOLLOWER, FOLLOWING, INRELATIONSHIP, STATUS_FOLLOWER } = require('../config/constants');
 
 const getTargetUserStatusWithAuthUser = async (targetUserId, authUserId) => {
     if (targetUserId === authUserId) {
@@ -32,6 +32,22 @@ const getTargetUserStatusWithAuthUser = async (targetUserId, authUserId) => {
     if (relationship[0].receiverId === authUserId) {
         return FOLLOWER
     }
+}
+
+const getTargetUserFollows = async (targetUserId) => {
+    const relationships = await prisma.follow.findMany({
+        where: {
+            OR: [
+                {requesterId: targetUserId},
+                {receiverId: targetUserId}
+            ]
+        },
+        include: {
+            requester: true,
+            receiver: true
+        }
+    });
+    return relationships
 }
 
 exports.updateProfileImage = async(req, res, next) => {
@@ -81,7 +97,21 @@ exports.getUserById = async (req, res, next) => {
             delete user.password;
             status = await getTargetUserStatusWithAuthUser(userId, req.user.id)
         }
-        res.status(200).json({user, status})
+
+        const follows = await getTargetUserFollows(userId)
+
+        let countFollowing = 0;
+        let countFollower = 0;
+
+        follows.forEach(el => {
+            if(el.requesterId === userId) {
+                countFollowing += 1
+            } else if (el.receiverId === userId) {
+                countFollower += 1
+            }
+        })
+        
+        res.status(200).json({user, status, follows, countFollower, countFollowing})
     } catch (err) {
         next (err)
     }
