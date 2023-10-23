@@ -61,3 +61,12 @@ RESPONSE
 400 {message: String}
 401 {message: String}
 500 {message: String}
+
+UNFOLLOW
+DELETE /follow/:followId/unfollow
+HEADER AUTHORIZATION Bearer ACCESS_TOKEN
+RESPONSE 
+200 {message: String}
+400 {message: String}
+401 {message: String}
+500 {message: String}

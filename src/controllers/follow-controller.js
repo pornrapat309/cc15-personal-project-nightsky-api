@@ -47,3 +47,32 @@ exports.requestFollow = async (req, res, next) => {
     }
 };
 
+exports.unfollow = async (req, res, next) => {
+    try {
+        const {value, error} = checkReceiverIdSchema.validate(req.params);
+        if (error) {
+            return next(error)
+        }
+        const existRelationship = await prisma.follow.findFirst({
+            where: {
+                AND: [
+                    {requesterId: req.user.id}, 
+                    {receiverId: value.receiverId}
+                ],
+                status: STATUS_FOLLOWER
+            }
+        });
+        if (!existRelationship) {
+            return next(createError('Relationship does not exist', 400))
+        }
+        await prisma.follow.delete({
+            where: {
+                id: existRelationship.id
+            }
+        });
+        res.status(200).json({message: 'Complete unfollow'})
+    } catch (err) {
+        next (err)
+    }
+}
+
