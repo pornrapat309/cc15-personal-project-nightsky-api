@@ -3,7 +3,7 @@ const createError = require('../utils/create-error');
 const { upload } = require('../utils/coudinary-service');
 const prisma = require('../models/prisma');
 const { checkUserIdSchema } = require('../validators/user-validator');
-const { AUTH_USER, UNKNOWN, FOLLOWER, FOLLOWING, INRELATIONSHIP, STATUS_FOLLOWER } = require('../config/constants');
+const { AUTH_USER, UNKNOWN, FOLLOWER, FOLLOWING, INRELATIONSHIP } = require('../config/constants');
 
 const getTargetUserStatusWithAuthUser = async (targetUserId, authUserId) => {
     if (targetUserId === authUserId) {
@@ -50,7 +50,7 @@ const getTargetUserFollows = async (targetUserId) => {
     return relationships
 }
 
-exports.updateProfileImage = async(req, res, next) => {
+exports.updateProfile = async(req, res, next) => {
     try {
         if (!req.files) {
             return next(createError('profile image is require'))
@@ -59,15 +59,16 @@ exports.updateProfileImage = async(req, res, next) => {
         if (req.files.profileImage) {
             const url = await upload(req.files.profileImage[0].path);
             response.profileImage = url;
-            await prisma.user.update({
-                data: {
-                    profileImage: url,
-                },
-                where: {
-                    id: req.user.id
-                }
-            });
         }
+        if (req.body.fullName) {
+            response.fullName = req.body.fullName
+        }
+        await prisma.user.update({
+            data: response,
+            where: {
+                id: req.user.id
+            }
+        });
         res.status(200).json(response)
     } catch (err) {
         next(err);
@@ -105,10 +106,8 @@ exports.getUserById = async (req, res, next) => {
 
         follows.forEach(el => {
             if(el.requesterId === userId) {
-                // countFollowing += 1
                 following.push(el.receiver)
             } else if (el.receiverId === userId) {
-                // countFollower += 1
                 follower.push(el.requester)
             }
         })
@@ -116,7 +115,6 @@ exports.getUserById = async (req, res, next) => {
         res.status(200).json({
             user, 
             status, 
-            // follows, 
             follower, 
             following
         })
