@@ -100,18 +100,26 @@ exports.getUserById = async (req, res, next) => {
 
         const follows = await getTargetUserFollows(userId)
 
-        let countFollowing = 0;
-        let countFollower = 0;
+        let following = [];
+        let follower = [];
 
         follows.forEach(el => {
             if(el.requesterId === userId) {
-                countFollowing += 1
+                // countFollowing += 1
+                following.push(el.receiver)
             } else if (el.receiverId === userId) {
-                countFollower += 1
+                // countFollower += 1
+                follower.push(el.requester)
             }
         })
         
-        res.status(200).json({user, status, follows, countFollower, countFollowing})
+        res.status(200).json({
+            user, 
+            status, 
+            // follows, 
+            follower, 
+            following
+        })
     } catch (err) {
         next (err)
     }
