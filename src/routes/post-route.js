@@ -1,17 +1,15 @@
 const express = require("express");
-const userController = require("../controllers/user-controller");
 const authenticateMiddleware = require("../middlewares/authenticate");
 const uploadMiddleware = require("../middlewares/upload");
+const postController = require("../controllers/post-controller");
 
 const router = express.Router();
 
-router.patch(
+router.post(
   "/",
   authenticateMiddleware,
-  uploadMiddleware.fields([{ name: "profileImage", maxCount: 1 }]),
-  userController.updateProfile
+  uploadMiddleware.single("image"),
+  postController.createPost
 );
-
-router.get("/:userId", authenticateMiddleware, userController.getUserById);
 
 module.exports = router;
