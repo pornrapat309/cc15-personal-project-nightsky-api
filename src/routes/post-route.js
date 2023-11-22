@@ -2,6 +2,7 @@ const express = require("express");
 const authenticateMiddleware = require("../middlewares/authenticate");
 const uploadMiddleware = require("../middlewares/upload");
 const postController = require("../controllers/post-controller");
+const likeController = require("../controllers/like-controller");
 
 const router = express.Router();
 
@@ -28,5 +29,7 @@ router.get(
 router.get("/getAllPosts", authenticateMiddleware, postController.getAllPosts);
 
 router.delete("/:postId", authenticateMiddleware, postController.deletePost);
+
+router.post("/:postId/like", authenticateMiddleware, likeController.toggleLike);
 
 module.exports = router;
