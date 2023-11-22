@@ -77,6 +77,19 @@ exports.getAllPostIncludeFollowingPost = async (req, res, next) => {
   }
 };
 
+exports.getAllPosts = async (req, res, next) => {
+  try {
+    const posts = await prisma.post.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    res.status(200).json({ posts });
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.deletePost = async (req, res, next) => {
   try {
     const { value, error } = checkPostIdSchema.validate(req.params);

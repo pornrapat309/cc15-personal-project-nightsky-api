@@ -25,6 +25,8 @@ router.get(
   postController.getAllPostIncludeFollowingPost
 );
 
+router.get("/getAllPosts", authenticateMiddleware, postController.getAllPosts);
+
 router.delete("/:postId", authenticateMiddleware, postController.deletePost);
 
 module.exports = router;
