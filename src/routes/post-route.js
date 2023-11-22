@@ -12,4 +12,10 @@ router.post(
   postController.createPost
 );
 
+router.get(
+  "/following",
+  authenticateMiddleware,
+  postController.getAllPostIncludeFollowingPost
+);
+
 module.exports = router;
