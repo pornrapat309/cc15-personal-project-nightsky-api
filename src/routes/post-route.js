@@ -12,6 +12,13 @@ router.post(
   postController.createPost
 );
 
+router.patch(
+  "/editPost/:postId",
+  authenticateMiddleware,
+  uploadMiddleware.single("image"),
+  postController.editPost
+);
+
 router.get(
   "/following",
   authenticateMiddleware,

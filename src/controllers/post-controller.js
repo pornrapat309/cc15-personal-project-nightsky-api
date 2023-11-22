@@ -102,3 +102,33 @@ exports.deletePost = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.editPost = async (req, res, next) => {
+  try {
+    const postId = +req.params.postId;
+    if (!req.file) {
+      return next(createError("image is require"));
+    }
+    const response = {};
+    if (req.file) {
+      const url = await upload(req.file.path);
+      response.image = url;
+    }
+    if (req.body.message) {
+      response.message = req.body.message;
+    }
+    await prisma.post.update({
+      data: response,
+      where: {
+        id: postId,
+      },
+    });
+    res.status(200).json(response);
+  } catch (err) {
+    next(err);
+  } finally {
+    if (req.file.image) {
+      fs.unlink(req.file.path);
+    }
+  }
+};
