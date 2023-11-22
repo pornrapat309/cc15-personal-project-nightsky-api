@@ -127,7 +127,7 @@ exports.editPost = async (req, res, next) => {
   } catch (err) {
     next(err);
   } finally {
-    if (req.file.image) {
+    if (req.file) {
       fs.unlink(req.file.path);
     }
   }
