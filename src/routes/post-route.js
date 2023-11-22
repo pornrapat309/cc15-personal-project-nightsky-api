@@ -18,4 +18,6 @@ router.get(
   postController.getAllPostIncludeFollowingPost
 );
 
+router.delete("/:postId", authenticateMiddleware, postController.deletePost);
+
 module.exports = router;

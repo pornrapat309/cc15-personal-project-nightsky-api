@@ -2,6 +2,7 @@ const fs = require("fs/promises");
 const createError = require("../utils/create-error");
 const prisma = require("../models/prisma");
 const { upload } = require("../utils/coudinary-service");
+const { checkPostIdSchema } = require("../validators/post-validator");
 
 const getFollowingId = async (targetUserId) => {
   const relationships = await prisma.follow.findMany({
@@ -71,6 +72,32 @@ exports.getAllPostIncludeFollowingPost = async (req, res, next) => {
       },
     });
     res.status(200).json({ posts });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.deletePost = async (req, res, next) => {
+  try {
+    const { value, error } = checkPostIdSchema.validate(req.params);
+    if (error) {
+      return next(error);
+    }
+    const existPost = await prisma.post.findFirst({
+      where: {
+        id: value.postId,
+        userId: req.user.id,
+      },
+    });
+    if (!existPost) {
+      return next(createError("cannot delete this post", 400));
+    }
+    await prisma.post.delete({
+      where: {
+        id: existPost.id,
+      },
+    });
+    res.status(200).json({ message: "delete" });
   } catch (err) {
     next(err);
   }
