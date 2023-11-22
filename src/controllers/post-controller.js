@@ -69,6 +69,17 @@ exports.getAllPostIncludeFollowingPost = async (req, res, next) => {
             profileImage: true,
           },
         },
+        likes: {
+          select: {
+            user: {
+              select: {
+                id: true,
+                username: true,
+                profileImage: true,
+              },
+            },
+          },
+        },
       },
     });
     res.status(200).json({ posts });
