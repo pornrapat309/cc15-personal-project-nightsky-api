@@ -106,9 +106,6 @@ exports.deletePost = async (req, res, next) => {
 exports.editPost = async (req, res, next) => {
   try {
     const postId = +req.params.postId;
-    if (!req.file) {
-      return next(createError("image is require"));
-    }
     const response = {};
     if (req.file) {
       const url = await upload(req.file.path);
