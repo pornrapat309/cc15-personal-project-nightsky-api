@@ -60,6 +60,15 @@ exports.getAllPostIncludeFollowingPost = async (req, res, next) => {
       orderBy: {
         createdAt: "desc",
       },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            profileImage: true,
+          },
+        },
+      },
     });
     res.status(200).json({ posts });
   } catch (err) {
