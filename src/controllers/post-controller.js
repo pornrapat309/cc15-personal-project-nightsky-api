@@ -71,13 +71,7 @@ exports.getAllPostIncludeFollowingPost = async (req, res, next) => {
         },
         likes: {
           select: {
-            user: {
-              select: {
-                id: true,
-                username: true,
-                profileImage: true,
-              },
-            },
+            userId: true,
           },
         },
       },
