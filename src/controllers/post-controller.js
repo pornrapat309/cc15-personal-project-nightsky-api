@@ -74,6 +74,12 @@ exports.getAllPostIncludeFollowingPost = async (req, res, next) => {
             userId: true,
           },
         },
+        comments: {
+          select: {
+            id: true,
+            message: true,
+          },
+        },
       },
     });
     res.status(200).json({ posts });
