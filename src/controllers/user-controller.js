@@ -52,6 +52,21 @@ const getTargetUserFollows = async (targetUserId) => {
   return relationships;
 };
 
+exports.getAlluser = async (req, res, next) => {
+  try {
+    const allUser = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        profileImage: true,
+      },
+    });
+    res.status(200).json(allUser);
+  } catch (err) {
+    next(err);
+  }
+};
+
 exports.updateProfile = async (req, res, next) => {
   try {
     if (!req.files) {

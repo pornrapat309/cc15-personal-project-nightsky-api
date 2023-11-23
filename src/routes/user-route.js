@@ -5,6 +5,8 @@ const uploadMiddleware = require("../middlewares/upload");
 
 const router = express.Router();
 
+router.get("/all", userController.getAlluser);
+
 router.patch(
   "/",
   authenticateMiddleware,
